@@ -8,6 +8,7 @@ interface QuoteFormProps {
 }
 
 const QuoteForm: React.FC<QuoteFormProps> = ({ onQuoteSubmit }) => {
+  const [marketName, setMarketName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [inn, setINN] = useState('');
@@ -31,11 +32,20 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onQuoteSubmit }) => {
         tooltip="Укажите название вашего магазина или предприятия, где будет осуществляться заказ сырья."
         rules={[{ required: true, message: 'Пожалуйста выберите маркет' }]}
       >
-        <Select>
-          <Select.Option value="demo">Demo 1</Select.Option>
-          <Select.Option value="demo 2">Demo 2</Select.Option>
-          <Select.Option value="demo 3">Demo 3</Select.Option>
-          <Select.Option value="demo 4">Demo 4</Select.Option>
+        <Select value={marketName} onChange={value => setMarketName(value)}>
+          <Select.Option value="Industrial">Промышленный</Select.Option>
+          <Select.Option value="auto">Автомобилестроение и транспорт</Select.Option>
+          <Select.Option value="goods">потребительские товары</Select.Option>
+          <Select.Option value="build">Здание и стройка</Select.Option>
+          <Select.Option value="food">Еда и полноценное питание</Select.Option>
+          <Select.Option value="electricity">Электротехника и электроника</Select.Option>
+          <Select.Option value="paint">Краски и покрытия</Select.Option>
+          <Select.Option value="print">Печать и упаковка</Select.Option>
+          <Select.Option value="care">Личная гигиена</Select.Option>
+          <Select.Option value="adhesives">Клеи и герметики</Select.Option>
+          <Select.Option value="household">Бытовая химия</Select.Option>
+          <Select.Option value="pharma">Здравоохранение и фармацевтика</Select.Option>
+          <Select.Option value="agriculture">Сельское хозяйство и корма</Select.Option>
         </Select>
       </Form.Item>
       <Form.Item

@@ -2,36 +2,79 @@ import React, { useState } from 'react';
 import { Form, InputNumber, Select } from 'antd';
 import isInn from 'is-inn-js';
 import { CustomInput, CustomButton } from '../../shared/components';
+import axios from 'axios';
 
 interface SamplesFormProps {
   onSamplesSubmit: () => void;
 }
 
 const SamplesForm: React.FC<SamplesFormProps> = ({ onSamplesSubmit }) => {
-  const [form] = Form.useForm();
+  // const [form] = Form.useForm();
+  const [market, setMarket] = useState('');
+  const [volumeRequest, setVolumeRequest] = useState('1');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
-  const [inn, setINN] = useState('');
+  const [inn, setInn] = useState('');
   const [comments, setComments] = useState('');
   const [contactPerson, setContactPerson] = useState('');
+  const [productInfo, setProductInfo] = useState('');
 
-  const onChangeSamples = (value: number) => {
-    console.log('changed', value);
+  // const onChangeSamples = (value: number) => {
+  //   console.log('changed', value);
+  // };
+
+  const sendSamples = async () => {
+    await axios
+      .post(
+        'http://localhost:8000/API/v1/commerce/samplerequest/',
+        {
+          product: volumeRequest,
+          volume_request: volumeRequest,
+          address: address,
+          market: market,
+          comment: comments,
+          product_info: productInfo,
+        },
+        {
+          headers: {
+            Authorization: `Token ${localStorage.getItem('token')}`,
+          },
+        }
+      )
+      .then(response => {
+        console.log('Ответ сервера:', response.data);
+      })
+      .catch(error => {
+        console.error('Ошибка при отправке запроса:', error);
+      });
+  };
+
+  const formData = () => {
+    sendSamples();
   };
 
   return (
-    <Form form={form} layout="vertical">
+    <Form layout="vertical" onFinish={formData}>
       <Form.Item
         name="market"
         tooltip="Укажите название вашего магазина или предприятия, где будет осуществляться заказ сырья."
         label="Маркет"
         rules={[{ required: true, message: 'Выберите маркет' }]}
       >
-        <Select>
-          <Select.Option value="demo">Demo 1</Select.Option>
-          <Select.Option value="demo">Demo 2</Select.Option>
-          <Select.Option value="demo">Demo 3</Select.Option>
-          <Select.Option value="demo">Demo 4</Select.Option>
+        <Select value={market} onChange={value => setMarket(value)}>
+          <Select.Option value="Industrial">Промышленный</Select.Option>
+          <Select.Option value="auto">Автомобилестроение и транспорт</Select.Option>
+          <Select.Option value="goods">потребительские товары</Select.Option>
+          <Select.Option value="build">Здание и стройка</Select.Option>
+          <Select.Option value="food">Еда и полноценное питание</Select.Option>
+          <Select.Option value="electricity">Электротехника и электроника</Select.Option>
+          <Select.Option value="paint">Краски и покрытия</Select.Option>
+          <Select.Option value="print">Печать и упаковка</Select.Option>
+          <Select.Option value="care">Личная гигиена</Select.Option>
+          <Select.Option value="adhesives">Клеи и герметики</Select.Option>
+          <Select.Option value="household">Бытовая химия</Select.Option>
+          <Select.Option value="pharma">Здравоохранение и фармацевтика</Select.Option>
+          <Select.Option value="agriculture">Сельское хозяйство и корма</Select.Option>
         </Select>
       </Form.Item>
       <Form.Item
@@ -40,7 +83,11 @@ const SamplesForm: React.FC<SamplesFormProps> = ({ onSamplesSubmit }) => {
         label="Количество образцов"
         rules={[{ required: true, message: 'Введите количество образцов' }]}
       >
-        <InputNumber style={{ width: '100%' }} min={1} max={100} defaultValue={1} onChange={() => onChangeSamples} />
+        <InputNumber
+          style={{ width: '100%' }}
+          value={volumeRequest}
+          onChange={value => setVolumeRequest(value as string)}
+        />
       </Form.Item>
       <Form.Item
         label="Контактное лицо"
@@ -48,7 +95,7 @@ const SamplesForm: React.FC<SamplesFormProps> = ({ onSamplesSubmit }) => {
         name="contact person"
         rules={[{ required: true, message: 'Пожалуйста, введите контактное лицо' }]}
       >
-        <CustomInput placeholder="" onChange={setContactPerson} value={contactPerson} name="" />
+        <CustomInput placeholder="" name="" onChange={setContactPerson} value={contactPerson} />
       </Form.Item>
       <Form.Item
         tooltip="Укажите точный адрес доставки сырья, чтобы мы могли доставить товар в нужное место."
@@ -65,7 +112,7 @@ const SamplesForm: React.FC<SamplesFormProps> = ({ onSamplesSubmit }) => {
         label="Номер телефона"
         required
       >
-        <CustomInput maxLength={10} placeholder="+7/8 (999) 999 99 99" onChange={setPhone} value={phone} name="" />
+        <CustomInput maxLength={10} placeholder="+7/8 (999) 999 99 99" name="" onChange={setPhone} value={phone} />
         {phone.length < 10 ? (
           <p style={{ color: '#ff8800' }}>Поле номера телефона должно содержать 10 цифр</p>
         ) : (
@@ -78,7 +125,7 @@ const SamplesForm: React.FC<SamplesFormProps> = ({ onSamplesSubmit }) => {
         label="ИНН"
         name="inn"
       >
-        <CustomInput maxLength={12} placeholder="" onChange={setINN} value={inn} name="INN" />
+        <CustomInput maxLength={12} placeholder="" onChange={setInn} value={inn} name="INN" />
         {inn.length == 12 ? (
           isInn(inn) ? (
             <p style={{ color: '#52c41a' }}>ИНН валиден</p>
@@ -103,6 +150,21 @@ const SamplesForm: React.FC<SamplesFormProps> = ({ onSamplesSubmit }) => {
           name="comments"
         />
       </Form.Item>
+
+      <Form.Item
+        required={false}
+        tooltip="Информация об использовании сырья."
+        name="product_info"
+        label="Информация об использовании сырья."
+      >
+        <CustomInput
+          placeholder="Информация об использовании сырья"
+          onChange={setProductInfo}
+          value={productInfo}
+          name="comments"
+        />
+      </Form.Item>
+
       <Form.Item>
         <CustomButton type="primary" text="Отправить" onClick={onSamplesSubmit} />
       </Form.Item>
