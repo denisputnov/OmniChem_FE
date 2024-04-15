@@ -1,5 +1,0 @@
-.footerItem {
-	width: 100%;
-	font-size: clamp(1.125rem, 1rem + 0.63vw, 1.563rem);
-	line-height: 1.45;
-}

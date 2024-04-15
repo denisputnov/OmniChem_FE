@@ -1,1 +1,0 @@
-export {CustomHeader} from './header.module'
